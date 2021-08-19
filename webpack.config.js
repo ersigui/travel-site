@@ -3,7 +3,6 @@ const path = require('path')
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
-const htmlWebpackPlugin = require('html-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const fse = require('fs-extra')
 
@@ -47,7 +46,17 @@ let config = {
   plugins: pages,
   module: {
     rules: [
-      cssConfig
+      cssConfig,
+      {
+        test: /\.js$/,
+        exclude: /(node_modules)/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-react', '@babel/preset-env']
+          }
+        }
+      }
     ]
   }
 }
@@ -71,16 +80,6 @@ if (currentTask == 'dev') {
 }
 
 if (currentTask == 'build') {
-  config.module.rules.push({
-    test: /\.js$/,
-    exclude: /(node_modules)/,
-    use: {
-      loader: 'babel-loader',
-      options: {
-        presets: ['@babel/preset-env']
-      }
-    }
-  })
 
   cssConfig.use.unshift(MiniCssExtractPlugin.loader)
   config.output = {
